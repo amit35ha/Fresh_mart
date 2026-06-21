@@ -475,7 +475,11 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
 });
 
 // 3. Google OAuth Verification (Backend Verification Flow)
-app.post('/api/auth/google', authLimiter, async (req, res) => {
+app.post('/api/auth/google', (req, res, next) => {
+  console.log('Received POST request on /api/auth/google');
+  next();
+}, authLimiter, async (req, res) => {
+  console.log('Passed rate limiter on /api/auth/google');
   const { credential } = req.body;
   if (!googleClient) {
     return res.status(500).json({ error: 'Google OAuth is not configured on this server.' });
@@ -968,7 +972,7 @@ app.put('/api/orders/:id/status', authenticateToken, requireAdmin, async (req, r
 // 9. CENTRALIZED ERROR HANDLING MIDDLEWARE
 // ==========================================================================
 if (NODE_ENV === 'production') {
-  const distPath = path.join(__dirname, 'dist');
+  const distPath = path.join(__dirname, '..', 'dist');
 
   app.use(express.static(distPath));
 

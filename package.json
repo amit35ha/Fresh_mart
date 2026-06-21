@@ -5,12 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "server": "nodemon server.js",
+    "server": "nodemon api/server.js",
     "concurrent": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js"
+    "start": "node api/server.js"
   },
   "engines": {
     "node": ">=20.19.0"
