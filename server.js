@@ -8,8 +8,13 @@ import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { OAuth2Client } from 'google-auth-library';
 import crypto from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // ==========================================================================
 // 1. ENVIRONMENT VARIABLES & STARTUP VALIDATION
@@ -28,6 +33,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+app.set('trust proxy', 1);
 
 // Mask and log Mongo URI
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/ss_kirana_store';
@@ -45,17 +51,31 @@ app.use(helmet());
 
 // Dynamic CORS configuration
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps/curl) or matching configured client origin
-    if (!origin || origin === CLIENT_ORIGIN || (NODE_ENV === 'development' && origin.startsWith('http://localhost:'))) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true
-}));
+const ALLOWED_CLIENT_ORIGINS = CLIENT_ORIGIN.split(',').map(origin => origin.trim()).filter(Boolean);
+const isSameHostOrigin = (origin, host) => {
+  try {
+    return Boolean(origin) && new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+};
+app.use((req, res, next) => {
+  cors({
+    origin: (origin, callback) => {
+      const isSameHost = isSameHostOrigin(origin, req.get('host'));
+      const isConfiguredOrigin = origin && ALLOWED_CLIENT_ORIGINS.includes(origin);
+      const isDevLocalhost = origin && NODE_ENV === 'development' && origin.startsWith('http://localhost:');
+
+      // Allow requests with no origin (like mobile apps/curl), same-host app requests, or configured frontend origins.
+      if (!origin || isSameHost || isConfiguredOrigin || isDevLocalhost) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true
+  })(req, res, next);
+});
 
 // Configure strict JSON size limit (2mb maximum to prevent body-parsing DoS)
 app.use(express.json({ limit: '2mb' }));
@@ -935,7 +955,22 @@ app.put('/api/orders/:id/status', authenticateToken, requireAdmin, async (req, r
 // ==========================================================================
 // 9. CENTRALIZED ERROR HANDLING MIDDLEWARE
 // ==========================================================================
+if (NODE_ENV === 'production') {
+  const distPath = path.join(__dirname, 'dist');
+
+  app.use(express.static(distPath));
+
+  app.use('/api', (req, res) => {
+    res.status(404).json({ error: 'API route not found.' });
+  });
+
+  app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+  });
+}
+
 app.use((err, req, res, next) => {
+  void next;
   console.error('SERVER ERROR:', err.message || err);
   res.status(500).json({ error: 'An internal server error occurred.' });
 });

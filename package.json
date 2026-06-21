@@ -9,7 +9,11 @@
     "concurrent": "concurrently \"npm run dev\" \"npm run server\"",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
