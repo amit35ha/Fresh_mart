@@ -1,5 +1,4 @@
-import React from 'react';
-import { Star, Leaf, Milk, Cookie, CupSoda, Sparkles, Home, Tag, ShoppingCart } from 'lucide-react';
+import { Leaf, Milk, Cookie, CupSoda, Sparkles, Home, Tag, ShoppingCart } from 'lucide-react';
 
 export default function ProductCard({ product, onOpenDetails, onAddToCart }) {
   const getAverageRating = (reviews = []) => {

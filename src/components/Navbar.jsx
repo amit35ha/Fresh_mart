@@ -1,5 +1,4 @@
-import React from 'react';
-import { ShoppingCart, User, ShieldAlert, Sun, Moon, LogOut, ClipboardList } from 'lucide-react';
+import { ShoppingCart, Sun, Moon, LogOut, ClipboardList } from 'lucide-react';
 
 export default function Navbar({ 
   currentTab, 

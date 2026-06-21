@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { X, Star, MessageSquare, Send } from 'lucide-react';
+import { useState } from 'react';
+import { X, MessageSquare, Send } from 'lucide-react';
 
-export default function ProductModal({ product, onClose, onAddToCart, onAddReview, currentUser, onOpenAuth }) {
+export default function ProductModal({ product, onClose, onAddToCart, onAddReview, currentUser }) {
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
-  const [authorName, setAuthorName] = useState('');
+  const [authorName, setAuthorName] = useState(currentUser ? currentUser.name : '');
   const [reviewText, setReviewText] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Pre-fill reviewer name if user is logged in
-  useEffect(() => {
-    if (currentUser) {
-      setAuthorName(currentUser.name);
-    } else {
-      setAuthorName('');
-    }
-  }, [currentUser]);
+  const [prevUser, setPrevUser] = useState(currentUser);
+  if (currentUser !== prevUser) {
+    setPrevUser(currentUser);
+    setAuthorName(currentUser ? currentUser.name : '');
+  }
 
   const getAverageRating = (reviews = []) => {
     if (!reviews || reviews.length === 0) return 0;

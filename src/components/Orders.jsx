@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ClipboardList, Calendar, MapPin, Phone, CreditCard, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { ClipboardList, Calendar, MapPin, Phone, CreditCard } from 'lucide-react';
 import InvoiceModal from './InvoiceModal';
 
 export default function Orders({ orders, setCurrentTab, currentUser, onOpenAuth }) {

@@ -1,5 +1,4 @@
-import React from 'react';
-import { X, Printer, ShoppingBag } from 'lucide-react';
+import { X, Printer } from 'lucide-react';
 
 export default function InvoiceModal({ isOpen, onClose, order }) {
   if (!isOpen || !order) return null;

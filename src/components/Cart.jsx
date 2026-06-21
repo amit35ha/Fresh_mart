@@ -1,22 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ShoppingCart, Plus, Minus, Trash2, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function Cart({ cart, onUpdateQty, onRemoveItem, onCheckout, setCurrentTab, currentUser, onOpenAuth }) {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(currentUser ? currentUser.name : '');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod');
   const [errorMsg, setErrorMsg] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  // Pre-fill recipient name if user is logged in
-  useEffect(() => {
-    if (currentUser) {
-      setName(currentUser.name);
-    } else {
-      setName('');
-    }
-  }, [currentUser]);
+  const [prevUser, setPrevUser] = useState(currentUser);
+  if (currentUser !== prevUser) {
+    setPrevUser(currentUser);
+    setName(currentUser ? currentUser.name : '');
+  }
 
   const getSubtotal = () => {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);

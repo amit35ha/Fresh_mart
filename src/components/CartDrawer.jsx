@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { ShoppingCart, X, Plus, Minus, Trash2, ArrowRight, CheckCircle2 } from 'lucide-react';
 
 export default function CartDrawer({ isOpen, onClose, cart, onUpdateQty, onRemoveItem, onCheckout, currentUser, onOpenAuth }) {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(currentUser ? currentUser.name : '');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -10,23 +10,21 @@ export default function CartDrawer({ isOpen, onClose, cart, onUpdateQty, onRemov
   const [errorMsg, setErrorMsg] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  // Pre-fill recipient name if user is logged in
-  useEffect(() => {
-    if (currentUser) {
-      setName(currentUser.name);
-    } else {
-      setName('');
-    }
-  }, [currentUser]);
+  const [prevUser, setPrevUser] = useState(currentUser);
+  if (currentUser !== prevUser) {
+    setPrevUser(currentUser);
+    setName(currentUser ? currentUser.name : '');
+  }
 
-  // Clear success state on drawer close/open
-  useEffect(() => {
+  const [prevIsOpen, setPrevIsOpen] = useState(isOpen);
+  if (isOpen !== prevIsOpen) {
+    setPrevIsOpen(isOpen);
     if (isOpen) {
       setOrderSuccess(false);
       setErrorMsg('');
       setDeliveryType('delivery');
     }
-  }, [isOpen]);
+  }
 
   const getSubtotal = () => {
     return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);

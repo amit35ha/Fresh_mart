@@ -332,6 +332,7 @@ async function authenticateToken(req, res, next) {
       };
       next();
     } catch (dbErr) {
+      console.error('Token validation database error:', dbErr);
       return res.status(500).json({ error: 'Internal server validation error.' });
     }
   });
@@ -367,7 +368,7 @@ async function optionalAuthenticateToken(req, res, next) {
           name: user.name
         };
       }
-    } catch (dbErr) {
+    } catch {
       // Ignore database errors during optional auth and proceed as guest
     }
     next();
@@ -414,6 +415,7 @@ app.post('/api/auth/login', authLimiter, async (req, res) => {
       res.status(401).json({ error: 'Invalid email or password.' });
     }
   } catch (err) {
+    console.error('Login database error:', err);
     res.status(500).json({ error: 'Server authentication failed.' });
   }
 });
@@ -467,6 +469,7 @@ app.post('/api/auth/register', authLimiter, async (req, res) => {
       token
     });
   } catch (err) {
+    console.error('Registration database error:', err);
     res.status(500).json({ error: 'Server registration failed.' });
   }
 });
@@ -590,6 +593,7 @@ app.put('/api/auth/profile', authenticateToken, async (req, res) => {
       role: user.role
     });
   } catch (err) {
+    console.error('Profile update database error:', err);
     res.status(500).json({ error: 'Profile save failed.' });
   }
 });
@@ -602,6 +606,7 @@ app.get('/api/products', async (req, res) => {
     const products = await Product.find().sort({ id: -1 });
     res.json(products);
   } catch (err) {
+    console.error('Fetch products database error:', err);
     res.status(500).json({ error: 'Fetch products failed.' });
   }
 });
@@ -645,6 +650,7 @@ app.post('/api/products', authenticateToken, requireAdmin, async (req, res) => {
     });
     res.json(newProduct);
   } catch (err) {
+    console.error('Add product database error:', err);
     res.status(500).json({ error: 'Add product failed.' });
   }
 });
@@ -710,6 +716,7 @@ app.put('/api/products/:id', authenticateToken, requireAdmin, async (req, res) =
     }
     res.json(updated);
   } catch (err) {
+    console.error('Update product database error:', err);
     res.status(500).json({ error: 'Update product failed.' });
   }
 });
@@ -727,6 +734,7 @@ app.delete('/api/products/:id', authenticateToken, requireAdmin, async (req, res
     }
     res.json({ success: true });
   } catch (err) {
+    console.error('Delete product database error:', err);
     res.status(500).json({ error: 'Delete product failed.' });
   }
 });
@@ -766,6 +774,7 @@ app.post('/api/products/:id/reviews', authenticateToken, reviewLimiter, async (r
     await product.save();
     res.json(product);
   } catch (err) {
+    console.error('Publish review database error:', err);
     res.status(500).json({ error: 'Review publish failed.' });
   }
 });
@@ -778,6 +787,7 @@ app.get('/api/orders', authenticateToken, requireAdmin, async (req, res) => {
     const orders = await Order.find().sort({ id: -1 });
     res.json(orders);
   } catch (err) {
+    console.error('Fetch orders database error:', err);
     res.status(500).json({ error: 'Fetch orders failed.' });
   }
 });
@@ -795,6 +805,7 @@ app.get('/api/orders/user/:email', authenticateToken, async (req, res) => {
     const orders = await Order.find({ 'shippingDetails.customerEmail': requestedEmail }).sort({ id: -1 });
     res.json(orders);
   } catch (err) {
+    console.error('Fetch user orders database error:', err);
     res.status(500).json({ error: 'Fetch user orders failed.' });
   }
 });
@@ -822,7 +833,7 @@ app.post('/api/orders', optionalAuthenticateToken, orderLimiter, async (req, res
     return res.status(400).json({ error: 'Customer address is invalid (5-200 characters).' });
   }
   
-  let finalCustomerEmail = customerEmail;
+  let finalCustomerEmail;
   if (req.user) {
     finalCustomerEmail = req.user.email.toLowerCase();
   } else {
@@ -948,6 +959,7 @@ app.put('/api/orders/:id/status', authenticateToken, requireAdmin, async (req, r
     }
     res.json(updated);
   } catch (err) {
+    console.error('Update order status database error:', err);
     res.status(500).json({ error: 'Order status update failed.' });
   }
 });
@@ -979,3 +991,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`FreshKart full-stack server running on http://localhost:${PORT}`);
 });
+
+export default app;

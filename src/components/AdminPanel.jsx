@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { PlusCircle, Trash2, ShieldAlert, BarChart3, ShoppingBag, Landmark, MessageSquare, Tag, Search, Edit3, Upload, XCircle, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { PlusCircle, Trash2, ShieldAlert, BarChart3, ShoppingBag, Landmark, MessageSquare, Search, Edit3, Upload, XCircle } from 'lucide-react';
 import InvoiceModal from './InvoiceModal';
 
 const PRESET_IMAGES = [

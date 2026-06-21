@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { X, Lock, Mail, User, Info } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Lock, Mail, User } from 'lucide-react';
 
-export default function AuthModal({ onClose, onLogin, onRegister, onGoogleLogin }) {
+export default function AuthModal({ onClose, onLogin, onRegister }) {
   const [activeTab, setActiveTab] = useState('login'); // 'login' or 'register'
   
   // Login Form States

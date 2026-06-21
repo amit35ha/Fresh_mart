@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import ProductCard from './components/ProductCard';
 import ProductModal from './components/ProductModal';
@@ -185,6 +185,45 @@ export default function App() {
   // Notifications State
   const [toasts, setToasts] = useState([]);
 
+  // Toast helper
+  const addToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3500);
+  };
+
+  // Google Login session trigger via secure backend verification
+  const handleGoogleLogin = async (credential) => {
+    try {
+      const res = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        addToast(data.error || 'Google authentication failed.', 'danger');
+        return;
+      }
+      setCurrentUser({ ...data.user, isGoogle: true });
+      setToken(data.token);
+      addToast(`Signed in with Google as ${data.user.name}`, 'success');
+      setCurrentTab('shop');
+    } catch (err) {
+      console.error("Google login connection error:", err);
+      addToast('Connection error. Google authentication failed.', 'danger');
+    }
+  };
+
+  // Google GSI ID JWT Credential parser
+  const handleGoogleCredentialResponse = (response) => {
+    if (response && response.credential) {
+      handleGoogleLogin(response.credential);
+    }
+  };
+
   // Fetch initial catalog of products on mount
   useEffect(() => {
     const fetchProducts = async () => {
@@ -249,10 +288,11 @@ export default function App() {
     return () => {
       try {
         document.body.removeChild(script);
-      } catch (e) {
+      } catch {
         // ignore
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Sync state to local storage (Only cart, theme, user session, and auth token)
@@ -280,45 +320,6 @@ export default function App() {
     localStorage.setItem('ss_theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
-
-  // Toast helper
-  const addToast = (message, type = 'success') => {
-    const id = Date.now();
-    setToasts((prev) => [...prev, { id, message, type }]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3500);
-  };
-
-  // Google GSI ID JWT Credential parser
-  const handleGoogleCredentialResponse = (response) => {
-    if (response && response.credential) {
-      handleGoogleLogin(response.credential);
-    }
-  };
-
-  // Google Login session trigger via secure backend verification
-  const handleGoogleLogin = async (credential) => {
-    try {
-      const res = await fetch('/api/auth/google', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ credential })
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        addToast(data.error || 'Google authentication failed.', 'danger');
-        return;
-      }
-      setCurrentUser({ ...data.user, isGoogle: true });
-      setToken(data.token);
-      addToast(`Signed in with Google as ${data.user.name}`, 'success');
-      setCurrentTab('shop');
-    } catch (err) {
-      console.error("Google login connection error:", err);
-      addToast('Connection error. Google authentication failed.', 'danger');
-    }
-  };
 
   // Theme Toggle
   const toggleTheme = () => {
@@ -789,13 +790,11 @@ export default function App() {
         onOpenAuth={() => { setIsCartOpen(false); setShowAuthModal(true); }}
       />
 
-      {/* Login / Register Authentication Modal Overlay */}
       {showAuthModal && (
         <AuthModal 
           onClose={() => setShowAuthModal(false)}
           onLogin={handleLogin}
           onRegister={handleRegister}
-          onGoogleLogin={handleGoogleLogin}
         />
       )}
 
@@ -806,7 +805,6 @@ export default function App() {
           onClose={() => setShowProfileModal(false)}
           currentUser={currentUser}
           onUpdateProfile={handleUpdateProfile}
-          addToast={addToast}
         />
       )}
 

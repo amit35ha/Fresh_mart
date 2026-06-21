@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, User, Mail, Shield, Save, Key, Image } from 'lucide-react';
 
 const PRESET_AVATARS = ['😊', '🦊', '🐼', '🐱', '🥑', '🥦', '🍪', '☕'];
 
-export default function UserProfileModal({ isOpen, onClose, currentUser, onUpdateProfile, addToast }) {
+export default function UserProfileModal({ isOpen, onClose, currentUser, onUpdateProfile }) {
   const [name, setName] = useState(currentUser ? currentUser.name : '');
   const [avatar, setAvatar] = useState(currentUser ? currentUser.photo || '😊' : '😊');
   const [password, setPassword] = useState('');
@@ -228,20 +228,37 @@ export default function UserProfileModal({ isOpen, onClose, currentUser, onUpdat
                 </div>
 
                 {password && (
-                  <div className="auth-form-group">
-                    <label>Confirm New Password</label>
-                    <div style={{ position: 'relative' }}>
-                      <input
-                        type="password"
-                        placeholder="Confirm new password"
-                        className="input-field"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        style={{ paddingLeft: '38px' }}
-                      />
-                      <Key className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                  <>
+                    <div className="auth-form-group">
+                      <label>Confirm New Password</label>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="password"
+                          placeholder="Confirm new password"
+                          className="input-field"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          style={{ paddingLeft: '38px' }}
+                        />
+                        <Key className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                      </div>
                     </div>
-                  </div>
+
+                    <div className="auth-form-group">
+                      <label>Current Password (Required for Change)</label>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="password"
+                          placeholder="Verify current password"
+                          className="input-field"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          style={{ paddingLeft: '38px' }}
+                        />
+                        <Key className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                      </div>
+                    </div>
+                  </>
                 )}
               </>
             )}
