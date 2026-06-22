@@ -1,4 +1,10 @@
 import express from 'express';
+import dns from 'dns';
+try {
+  dns.setServers(['8.8.8.8', '8.8.4.4']);
+} catch {
+  // Safe fallback if setting custom DNS servers is blocked by host policies
+}
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
