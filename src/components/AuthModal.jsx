@@ -23,9 +23,10 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
       try {
         const btnContainer = document.getElementById("google-button-container");
         if (btnContainer) {
+          const width = Math.max(200, Math.min(364, window.innerWidth - 64));
           window.google.accounts.id.renderButton(
             btnContainer,
-            { theme: "outline", size: "large", width: 364 }
+            { theme: "outline", size: "large", width: width }
           );
         }
       } catch (err) {
@@ -34,14 +35,14 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
     }
   }, [activeTab]);
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
     if (!loginEmail.trim()) return setErrorMsg('Email is required.');
     if (!loginPassword) return setErrorMsg('Password is required.');
 
-    const success = onLogin(loginEmail.trim(), loginPassword);
+    const success = await onLogin(loginEmail.trim(), loginPassword);
     if (!success) {
       setErrorMsg('Invalid email or password.');
     } else {
@@ -49,7 +50,7 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
     }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     setErrorMsg('');
 
@@ -68,9 +69,9 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
       return setErrorMsg('Passwords do not match.');
     }
 
-    const result = onRegister(regName.trim(), regEmail.trim(), regPassword);
+    const result = await onRegister(regName.trim(), regEmail.trim(), regPassword);
     if (!result.success) {
-      setErrorMsg(result.message);
+      setErrorMsg(result.message || 'Registration failed.');
     } else {
       onClose();
     }

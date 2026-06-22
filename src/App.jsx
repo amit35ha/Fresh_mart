@@ -209,6 +209,7 @@ export default function App() {
       }
       setCurrentUser({ ...data.user, isGoogle: true });
       setToken(data.token);
+      setShowAuthModal(false);
       addToast(`Signed in with Google as ${data.user.name}`, 'success');
       setCurrentTab('shop');
     } catch (err) {

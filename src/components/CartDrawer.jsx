@@ -46,13 +46,24 @@ export default function CartDrawer({ isOpen, onClose, cart, onUpdateQty, onRemov
       return setErrorMsg('Complete address is required.');
     }
 
+    const backendPaymentMethods = {
+      cod: 'Cash on Delivery',
+      upi: 'UPI / NetBanking',
+      card: 'Credit/Debit Card'
+    };
+
+    const backendDeliveryTypes = {
+      delivery: 'delivery',
+      takeaway: 'pickup'
+    };
+
     onCheckout({
       customerName: name.trim(),
       customerPhone: phone.trim(),
       customerAddress: deliveryType === 'takeaway' ? 'Store Pickup (Takeaway)' : address.trim(),
       customerEmail: currentUser ? currentUser.email : 'guest@freshkart.com',
-      paymentMethod,
-      deliveryType,
+      paymentMethod: backendPaymentMethods[paymentMethod] || 'Cash on Delivery',
+      deliveryType: backendDeliveryTypes[deliveryType] || 'delivery',
       shippingCost: shipping,
       subtotal,
       total
