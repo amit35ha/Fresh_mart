@@ -18,7 +18,7 @@ const PRESET_IMAGES = [
   { name: 'Honey', url: '🍯' }
 ];
 
-export default function AdminPanel({ products, orders, onAddProduct, onUpdateProduct, onDeleteProduct, onUpdateOrderStatus, categories }) {
+export default function AdminPanel({ products, orders, users, onAddProduct, onUpdateProduct, onDeleteProduct, onUpdateOrderStatus, onUpdateUserRole, onAddUser, categories }) {
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);
 
   // Product CRUD Form State
@@ -623,6 +623,79 @@ export default function AdminPanel({ products, orders, onAddProduct, onUpdatePro
                           </div>
                         ))}
                       </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* User Administration Board */}
+          <div className="glass-panel" style={{ marginTop: '20px' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px', color: 'var(--bg-nav)' }}>Registered Users ({users ? users.length : 0})</h3>
+
+            <div style={{ marginBottom: '16px', background: 'var(--bg-card)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 700, marginBottom: '10px' }}>Add New User</h4>
+              <form 
+                style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const form = e.target;
+                  const res = await onAddUser({
+                    name: form.name.value,
+                    email: form.email.value,
+                    password: form.password.value,
+                    role: form.role.value
+                  });
+                  if (res) form.reset();
+                }}
+              >
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <input name="name" type="text" placeholder="Name" className="input-field" required style={{ flex: 1, minWidth: '120px', padding: '6px 10px', fontSize: '0.8rem' }} />
+                  <input name="email" type="email" placeholder="Email" className="input-field" required style={{ flex: 1, minWidth: '150px', padding: '6px 10px', fontSize: '0.8rem' }} />
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  <input name="password" type="text" placeholder="Password" className="input-field" required style={{ flex: 1, minWidth: '120px', padding: '6px 10px', fontSize: '0.8rem' }} />
+                  <select name="role" className="input-field" style={{ width: 'auto', padding: '6px 10px', fontSize: '0.8rem', background: 'var(--bg-input)' }}>
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                  <button type="submit" className="btn-primary" style={{ padding: '6px 16px', fontSize: '0.8rem', borderRadius: '6px' }}>Add User</button>
+                </div>
+              </form>
+            </div>
+
+            {!users || users.length === 0 ? (
+              <div className="no-items-state" style={{ padding: '16px' }}>
+                No registered users.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {users.map((user) => (
+                  <div key={user._id || user.email} style={{ border: '1px solid var(--border-color)', borderRadius: '8px', padding: '12px', background: 'var(--bg-card-sec)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'var(--bg-card)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', overflow: 'hidden' }}>
+                        {user.photo && user.photo.startsWith('data:') ? (
+                          <img src={user.photo} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (user.photo || '👤')}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 700, fontSize: '0.85rem' }}>{user.name}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.email}</div>
+                      </div>
+                    </div>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Role: </span>
+                      <select
+                        value={user.role}
+                        onChange={(e) => onUpdateUserRole(user.email, e.target.value)}
+                        className="input-field"
+                        style={{ display: 'inline-block', width: 'fit-content', padding: '2px 4px', fontSize: '0.75rem', height: 'auto', background: 'var(--bg-input)', border: '1px solid var(--border-color)', color: user.role === 'admin' ? 'var(--secondary)' : 'var(--text-primary)', borderRadius: '4px', fontWeight: user.role === 'admin' ? 700 : 400 }}
+                      >
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                      </select>
                     </div>
                   </div>
                 ))}

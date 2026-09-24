@@ -181,6 +181,7 @@ export default function App() {
   });
 
   const [orders, setOrders] = useState([]);
+  const [users, setUsers] = useState([]);
 
   // Filters State
   const [searchQuery, setSearchQuery] = useState('');
@@ -286,6 +287,28 @@ export default function App() {
     };
     fetchOrders();
   }, [currentUser, token]);
+
+  // Fetch users if admin
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!currentUser || !token || currentUser.role !== 'admin') {
+        setUsers([]);
+        return;
+      }
+      try {
+        const res = await fetch('/api/users', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setUsers(data);
+        }
+      } catch (err) {
+        console.error("Failed to load users", err);
+      }
+    };
+    fetchUsers();
+  }, [currentUser, token, currentTab]);
 
   // Load Google GSI OAuth Library dynamically
   useEffect(() => {
@@ -724,6 +747,59 @@ export default function App() {
     return matchesSearch && matchesCategory;
   });
 
+  // Update User Role from AdminPanel
+  const handleUpdateUserRole = async (email, newRole) => {
+    try {
+      const res = await fetch(`/api/users/${email}/role`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ role: newRole })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(users.map(u => u.email === email ? { ...u, role: data.user.role } : u));
+        addToast(data.message, 'success');
+      } else {
+        const errData = await res.json();
+        addToast(errData.error || 'Failed to update user role.', 'danger');
+      }
+    } catch (err) {
+      console.error(err);
+      addToast('Connection error. Failed to update role.', 'danger');
+    }
+  };
+
+  // Add User from AdminPanel
+  const handleAddUser = async (userData) => {
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(userData)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsers([data.user, ...users]);
+        addToast(data.message, 'success');
+        return true;
+      } else {
+        const errData = await res.json();
+        addToast(errData.error || 'Failed to add user.', 'danger');
+        return false;
+      }
+    } catch (err) {
+      console.error(err);
+      addToast('Connection error. Failed to add user.', 'danger');
+      return false;
+    }
+  };
+
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
@@ -861,11 +937,14 @@ export default function App() {
           <AdminPanel 
             products={products}
             orders={orders}
+            users={users}
             categories={CATEGORIES}
             onAddProduct={handleAddProduct}
             onUpdateProduct={handleUpdateProduct}
             onDeleteProduct={handleDeleteProduct}
             onUpdateOrderStatus={handleUpdateOrderStatus}
+            onUpdateUserRole={handleUpdateUserRole}
+            onAddUser={handleAddUser}
           />
         )}
       </main>
