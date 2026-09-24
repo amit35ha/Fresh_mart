@@ -706,6 +706,37 @@ textarea.input-field {
   color: var(--secondary) !important;
 }
 
+/* Admin Dashboard Grids */
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+@media (max-width: 1024px) {
+  .admin-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Mobile stacked cards for admin panel */
 .admin-stacked-cards {
   display: none;
