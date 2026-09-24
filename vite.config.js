@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://fresh-mart-1-x8e6.onrender.com',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false
       }
