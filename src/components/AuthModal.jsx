@@ -11,6 +11,7 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
   // Register Form States
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
+  const [regPhone, setRegPhone] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
 
@@ -68,8 +69,10 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
     if (regPassword !== regConfirmPassword) {
       return setErrorMsg('Passwords do not match.');
     }
+    
+    if (!regPhone.trim()) return setErrorMsg('Phone number is required.');
 
-    const result = await onRegister(regName.trim(), regEmail.trim(), regPassword);
+    const result = await onRegister(regName.trim(), regEmail.trim(), regPassword, regPhone.trim());
     if (!result.success) {
       setErrorMsg(result.message || 'Registration failed.');
     } else {
@@ -192,6 +195,21 @@ export default function AuthModal({ onClose, onLogin, onRegister }) {
                   style={{ paddingLeft: '38px' }}
                 />
                 <Mail className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+              </div>
+            </div>
+
+            <div className="auth-form-group">
+              <label>Phone Number</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="tel"
+                  placeholder="e.g. 9876543210"
+                  className="input-field"
+                  value={regPhone}
+                  onChange={(e) => setRegPhone(e.target.value)}
+                  style={{ paddingLeft: '38px' }}
+                />
+                <span className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>📞</span>
               </div>
             </div>
 
