@@ -448,6 +448,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
             </div>
           </form>
         </div>
+        )}
 
         {/* Right Column: Manage Catalog Lists */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
