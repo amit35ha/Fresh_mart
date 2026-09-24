@@ -164,6 +164,10 @@ export default function App() {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   
+  // Pending user state for Google Phone Prompt
+  const [pendingPhoneUser, setPendingPhoneUser] = useState(null);
+  const [pendingPhone, setPendingPhone] = useState('');
+  
   // Navigation Tabs
   const [currentTab, setCurrentTab] = useState('shop');
   
@@ -208,6 +212,14 @@ export default function App() {
         addToast(data.error || 'Google authentication failed.', 'danger');
         return;
       }
+      
+      if (data.isNewUser && !data.user.phone) {
+        // Need to ask for phone number before completing login
+        setPendingPhoneUser({ user: data.user, token: data.token });
+        setShowAuthModal(false);
+        return;
+      }
+      
       setCurrentUser({ ...data.user, isGoogle: true });
       setToken(data.token);
       setShowAuthModal(false);
@@ -358,6 +370,42 @@ export default function App() {
       console.error(err);
       addToast('Connection error. Server may be offline.', 'danger');
       return false;
+    }
+  };
+
+  const handlePendingPhoneSubmit = async (e) => {
+    e.preventDefault();
+    if (!pendingPhone || pendingPhone.trim().length < 10) {
+      addToast('Please enter a valid phone number.', 'warning');
+      return;
+    }
+    
+    // We update the profile using the temporarily held token
+    try {
+      const res = await fetch('/api/auth/profile', {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${pendingPhoneUser.token}`
+        },
+        body: JSON.stringify({
+          phone: pendingPhone.trim()
+        })
+      });
+      if (!res.ok) {
+        addToast('Failed to save phone number.', 'danger');
+        return;
+      }
+      const updatedUser = await res.json();
+      setCurrentUser({ ...updatedUser, isGoogle: true });
+      setToken(pendingPhoneUser.token);
+      setPendingPhoneUser(null);
+      setPendingPhone('');
+      addToast(`Account created! Welcome, ${updatedUser.name}`, 'success');
+      setCurrentTab('shop');
+    } catch (err) {
+      console.error(err);
+      addToast('Connection error. Failed to save phone.', 'danger');
     }
   };
 
@@ -679,6 +727,44 @@ export default function App() {
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       
+      {/* Pending Google User Phone Prompt Modal */}
+      {pendingPhoneUser && (
+        <div className="auth-overlay" onClick={() => setPendingPhoneUser(null)}>
+          <div className="auth-card" onClick={(e) => e.stopPropagation()} style={{ padding: '32px' }}>
+            <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+              <div className="navbar-logo-icon" style={{ display: 'inline-flex', background: 'var(--bg-nav)', padding: '12px', borderRadius: '50%', marginBottom: '16px' }}>
+                <span style={{ fontSize: '24px' }}>📞</span>
+              </div>
+              <h2 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.25rem', fontWeight: 800, color: 'var(--bg-nav)', marginBottom: '8px' }}>
+                Almost Done!
+              </h2>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+                Please provide your phone number to complete your registration.
+              </p>
+            </div>
+            <form onSubmit={handlePendingPhoneSubmit}>
+              <div className="auth-form-group" style={{ marginBottom: '24px' }}>
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="tel"
+                    placeholder="e.g. 9876543210"
+                    className="input-field"
+                    value={pendingPhone}
+                    onChange={(e) => setPendingPhone(e.target.value)}
+                    style={{ paddingLeft: '38px', padding: '12px 12px 12px 38px' }}
+                    autoFocus
+                  />
+                  <span className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>+</span>
+                </div>
+              </div>
+              <button type="submit" className="btn-primary" style={{ width: '100%', padding: '12px', borderRadius: '8px', fontWeight: 600 }}>
+                Complete Sign Up
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Navigation bar */}
       <Navbar 
         currentTab={currentTab} 
