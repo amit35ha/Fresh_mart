@@ -592,7 +592,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
           )}
 
           {/* Manage Orders Board */}
-          {(activeTab === 'dashboard' || activeTab === 'orders') && (
+          {activeTab === 'orders' && (
           <div className="glass-panel">
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px', color: 'var(--bg-nav)' }}>Customer Orders ({orders.length})</h3>
 
@@ -671,7 +671,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
           )}
 
           {/* User Administration Board */}
-          {(activeTab === 'dashboard' || activeTab === 'users') && (
+          {activeTab === 'users' && (
           <div className="glass-panel" style={{ marginTop: '20px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px', color: 'var(--bg-nav)' }}>Registered Users ({users ? users.length : 0})</h3>
 
