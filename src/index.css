@@ -107,6 +107,29 @@ body {
   to { transform: scale(1); opacity: 1; }
 }
 
+@keyframes skeletonLoading {
+  0% { background-color: var(--border-color); }
+  50% { background-color: var(--border-color-hover); }
+  100% { background-color: var(--border-color); }
+}
+
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  animation: skeletonLoading 1.5s infinite ease-in-out;
+}
+
+.skeleton-text {
+  border-radius: 4px;
+  animation: skeletonLoading 1.5s infinite ease-in-out;
+}
+
 /* Buttons */
 button {
   cursor: pointer;

@@ -169,6 +169,7 @@ export default function App() {
   
   // Products and Orders
   const [products, setProducts] = useState([]);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
   
   const [cart, setCart] = useState(() => {
     const saved = localStorage.getItem('ss_cart');
@@ -228,6 +229,7 @@ export default function App() {
   // Fetch initial catalog of products on mount
   useEffect(() => {
     const fetchProducts = async () => {
+      setIsLoadingProducts(true);
       try {
         const res = await fetch('/api/products');
         if (res.ok) {
@@ -241,6 +243,8 @@ export default function App() {
         console.error("Failed to load products", err);
         setProducts(INITIAL_PRODUCTS);
         addToast("Backend server offline. Displaying demo catalog.", "warning");
+      } finally {
+        setIsLoadingProducts(false);
       }
     };
     fetchProducts();
@@ -722,7 +726,20 @@ export default function App() {
             </div>
 
             {/* Catalog Grid */}
-            {filteredProducts.length === 0 ? (
+            {isLoadingProducts ? (
+              <div className="grid-products">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                  <div key={n} className="product-card skeleton-card">
+                    <div className="skeleton-image"></div>
+                    <div className="skeleton-text" style={{ width: '80%', height: '24px', margin: '0 0 4px 0' }}></div>
+                    <div className="skeleton-text" style={{ width: '40%', height: '22px', margin: '0 0 2px 0' }}></div>
+                    <div className="skeleton-text" style={{ width: '30%', height: '14px', margin: '0 0 8px 0' }}></div>
+                    <div className="skeleton-text" style={{ width: '60%', height: '14px', margin: '0 0 16px 0' }}></div>
+                    <div className="skeleton-text" style={{ width: '100%', height: '40px', borderRadius: '8px' }}></div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="glass-panel no-items-state">
                 <ShoppingBag className="no-items-icon" style={{ width: '56px', height: '56px' }} />
                 <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>No Products Match Your Criteria</h3>
