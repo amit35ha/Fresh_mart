@@ -20,6 +20,7 @@ const PRESET_IMAGES = [
 
 export default function AdminPanel({ products, orders, users, onAddProduct, onUpdateProduct, onDeleteProduct, onUpdateOrderStatus, onUpdateUserRole, onAddUser, categories }) {
   const [selectedInvoiceOrder, setSelectedInvoiceOrder] = useState(null);
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   // Product CRUD Form State
   const [editingProduct, setEditingProduct] = useState(null);
@@ -214,11 +215,35 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
         </div>
       </div>
 
+      {/* Admin Tabs */}
+      <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', marginBottom: '20px', paddingBottom: '4px' }}>
+        {['dashboard', 'products', 'orders', 'users'].map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: 'none',
+              background: activeTab === tab ? 'var(--secondary)' : 'var(--bg-card-sec)',
+              color: activeTab === tab ? '#fff' : 'var(--text-primary)',
+              fontWeight: 700,
+              textTransform: 'capitalize',
+              cursor: 'pointer',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
       {/* Main Form/Grid */}
-      <div className="admin-grid">
+      <div className={(activeTab === 'dashboard' || activeTab === 'products') ? 'admin-grid' : ''}>
         
-        {/* Left Column: Add / Edit Form */}
-        <div className="glass-panel admin-form-panel">
+        {/* Left Column: Add / Edit Form (Shows in Dashboard or Products) */}
+        {(activeTab === 'dashboard' || activeTab === 'products') && (
+        <div className="glass-panel admin-form-panel" style={activeTab === 'products' ? { maxWidth: '600px', margin: '0 auto 20px auto' } : {}}>
           <h3 style={{ fontSize: '1.15rem', fontWeight: 800, marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px', color: editingProduct ? 'var(--primary)' : 'var(--secondary)' }}>
             <PlusCircle className="w-4.5 h-4.5" />
             {editingProduct ? 'Edit Product Details' : 'Publish New Product'}
@@ -428,6 +453,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Table Search and List */}
+          {(activeTab === 'dashboard' || activeTab === 'products') && (
           <div className="glass-panel">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--bg-nav)' }}>Catalog Manager ({totalProducts})</h3>
@@ -552,8 +578,10 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
               )}
             </div>
           </div>
+          )}
 
           {/* Manage Orders Board */}
+          {(activeTab === 'dashboard' || activeTab === 'orders') && (
           <div className="glass-panel">
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px', color: 'var(--bg-nav)' }}>Customer Orders ({orders.length})</h3>
 
@@ -629,8 +657,10 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
               </div>
             )}
           </div>
+          )}
 
           {/* User Administration Board */}
+          {(activeTab === 'dashboard' || activeTab === 'users') && (
           <div className="glass-panel" style={{ marginTop: '20px' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '16px', color: 'var(--bg-nav)' }}>Registered Users ({users ? users.length : 0})</h3>
 
@@ -702,6 +732,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
               </div>
             )}
           </div>
+          )}
 
         </div>
 
