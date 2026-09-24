@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PlusCircle, Trash2, ShieldAlert, BarChart3, ShoppingBag, Landmark, MessageSquare, Search, Edit3, Upload, XCircle } from 'lucide-react';
+import { PlusCircle, Trash2, ShieldAlert, BarChart3, ShoppingBag, Landmark, MessageSquare, Search, Edit3, Upload, XCircle, Users } from 'lucide-react';
 import InvoiceModal from './InvoiceModal';
 
 const PRESET_IMAGES = [
@@ -174,7 +174,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
 
       {/* KPI Stats Grid */}
       <div className="admin-stats-grid">
-        <div className="glass-panel stat-card">
+        <div className="glass-panel stat-card" onClick={() => setActiveTab('products')} style={{ cursor: 'pointer', border: activeTab === 'products' ? '2px solid var(--secondary)' : '1px solid var(--border-color)' }}>
           <div className="stat-icon-box" style={{ background: 'var(--secondary)' }}>
             <ShoppingBag className="w-5 h-5" />
           </div>
@@ -184,7 +184,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
           </div>
         </div>
 
-        <div className="glass-panel stat-card">
+        <div className="glass-panel stat-card" onClick={() => setActiveTab('dashboard')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon-box" style={{ background: '#0d8a5f' }}>
             <Landmark className="w-5 h-5" />
           </div>
@@ -194,7 +194,7 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
           </div>
         </div>
 
-        <div className="glass-panel stat-card">
+        <div className="glass-panel stat-card" onClick={() => setActiveTab('orders')} style={{ cursor: 'pointer', border: activeTab === 'orders' ? '2px solid var(--secondary)' : '1px solid var(--border-color)' }}>
           <div className="stat-icon-box" style={{ background: 'var(--primary)' }}>
             <BarChart3 className="w-5 h-5" />
           </div>
@@ -204,13 +204,23 @@ export default function AdminPanel({ products, orders, users, onAddProduct, onUp
           </div>
         </div>
 
-        <div className="glass-panel stat-card">
+        <div className="glass-panel stat-card" onClick={() => setActiveTab('dashboard')} style={{ cursor: 'pointer' }}>
           <div className="stat-icon-box" style={{ background: '#8b5cf6' }}>
             <MessageSquare className="w-5 h-5" />
           </div>
           <div>
             <div className="stat-value">{totalReviews}</div>
             <div className="stat-label">Reviews</div>
+          </div>
+        </div>
+
+        <div className="glass-panel stat-card" onClick={() => setActiveTab('users')} style={{ cursor: 'pointer', border: activeTab === 'users' ? '2px solid var(--secondary)' : '1px solid var(--border-color)' }}>
+          <div className="stat-icon-box" style={{ background: '#0ea5e9' }}>
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="stat-value">{users ? users.length : 0}</div>
+            <div className="stat-label">Registered Users</div>
           </div>
         </div>
       </div>
