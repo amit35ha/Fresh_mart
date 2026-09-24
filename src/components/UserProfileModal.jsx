@@ -5,6 +5,7 @@ const PRESET_AVATARS = ['😊', '🦊', '🐼', '🐱', '🥑', '🥦', '🍪', 
 
 export default function UserProfileModal({ isOpen, onClose, currentUser, onUpdateProfile }) {
   const [name, setName] = useState(currentUser ? currentUser.name : '');
+  const [phone, setPhone] = useState(currentUser ? currentUser.phone || '' : '');
   const [avatar, setAvatar] = useState(currentUser ? currentUser.photo || '😊' : '😊');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -84,8 +85,14 @@ export default function UserProfileModal({ isOpen, onClose, currentUser, onUpdat
       }
     }
 
+    if (phone.trim() && phone.trim().length < 10) {
+      setErrorMsg('Phone number is invalid.');
+      return;
+    }
+
     onUpdateProfile({
       name: name.trim(),
+      phone: phone.trim() || undefined,
       photo: avatar,
       password: !isGoogle && password ? password : undefined,
       currentPassword: !isGoogle && password ? currentPassword : undefined
@@ -206,6 +213,22 @@ export default function UserProfileModal({ isOpen, onClose, currentUser, onUpdat
                   style={{ paddingLeft: '38px' }}
                 />
                 <User className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+              </div>
+            </div>
+
+            {/* Phone Number */}
+            <div className="auth-form-group">
+              <label>Phone Number</label>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="tel"
+                  placeholder="e.g. 9876543210"
+                  className="input-field"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  style={{ paddingLeft: '38px' }}
+                />
+                <span className="absolute text-gray-400 w-4 h-4" style={{ left: '12px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center' }}>📞</span>
               </div>
             </div>
 
